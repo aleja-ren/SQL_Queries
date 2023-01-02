@@ -44,7 +44,7 @@ group by V.alid;
 select *
 from tabla T
 where T.att >= ALL (select T2.att
-					from tabla T2);
+			from tabla T2);
 */
 
 /*ahora de esta tabla tenemos que obtener el de mayor valor, esta tabla que he obtenido antes va 
@@ -53,10 +53,9 @@ el V.alid tenemos que agruparlo*/
 select V.alid, count(*) as numVuelos
 from Vuelo V
 group by V.alid
-having count(*)  >= ALL
-				 (select count(*)
-				 from Vuelo V2
-				 group by V2.alid);
+having count(*)  >= ALL (select count(*)
+			from Vuelo V2
+			group by V2.alid);
 
 /*otra opcion es hacerlo con un with, donde la estructura cambia, primero haremos la tabla con los conteos
 a la que le vamos a dar un nombre y despues ya obtendremos el maximo*/
@@ -66,12 +65,12 @@ with Nvuelos as (select V.alid, count(*) as numVuelos
 select NV.alid, NV.numVuelos
 from Nvuelos NV
 where NV.numVuelos >= ALL (select NV2.numVuelos
-						   from Nvuelos N2);
+				from Nvuelos N2);
 
 /*4. las 5 compañias con el mayor numero de vuelos*/
 with Nvuelos as (select V.alid, count(*) as numVuelos
-				 from Vuelo V
-				 group by V.alid)
+			from Vuelo V
+			group by V.alid)
 select NV.alid, NV.numVuelos
 from Nvuelos NV
 where 5 > (select count(*)
@@ -178,8 +177,16 @@ with Nvuelos as (select V.alid, count(*) as nvu
 				group by V.alid)
 select NV.alid, NV.nvu
 from Nvuelos NV
-where 2 >= (select count(*)
+where 3 >= (select count(*)
 			 from Nvuelos NV2
 			 where NV2.nvu < NV.nvu);
 
 --COMO SERIA PARA BUSCAR LA AEROLINEA CON EL MINIMO NUMERO DE VUELOS
+with Nvuelos as (select V.alid, count(*) as nvu
+				from Vuelo V
+				group by V.alid)
+select NV.alid, NV.nvu
+from Nvuelos NV
+where NV.nvu >= ALL(select count(*)
+			 from Nvuelos NV2
+			 group by NV2.alid);
